@@ -14,9 +14,18 @@ Further exploration of reflective lambda possibilities can be found here:
 
 This benchmark has been developed using JMH <http://JMH>
 
-Findings
+Results
 --------
 
+````
+Benchmark                    Mode  Cnt          Score         Error  Units
+MyBenchmark.testDirect      thrpt  200  387338280.397 ± 2670093.195  ops/s
+MyBenchmark.testLambda      thrpt  200  374518231.277 ± 1923816.488  ops/s
+MyBenchmark.testMH          thrpt  200  171491253.683 ±  634211.430  ops/s
+MyBenchmark.testReflection  thrpt  200   78089006.137 ±  455278.123  ops/s
+````
+Findings
+--------
 
 
 Build
