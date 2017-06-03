@@ -38,5 +38,4 @@ public class SimpleBean {
       return a<b? a: b;
    }
 
-
 }
