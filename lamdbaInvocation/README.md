@@ -3,7 +3,7 @@ Reflective lambda invocation benchmark
 TLDR;
 -----
 
-Method reflection using injected Lambda functions (``MethodHandles.lookup().unreflect( Object.class.getDeclaredMethod() ).invoke()``) is the most efficient method of reflectively invoking methods if direct method invocation is not possible.
+Method reflection using injected Lambda functions (``LambdaMetafactory.metafactory(...).getTarget().invokeExact()``) is the most efficient method of reflectively invoking methods if direct method invocation is not possible.
 
 Intro
 ----
@@ -13,7 +13,7 @@ This microbenchmark explores three different reflective invocation methods and c
 
 * Reflection: ``Object.class.getDeclaredMethod().reflected.invoke()``
 * Method Handler: ``MethodHandles.lookup().unreflect( Object.class.getDeclaredMethod() ).invoke()``
-* Lambda: ``LambdaMetafactory.metafactory().getTarget().invokeExact()``
+* Lambda: ``LambdaMetafactory.metafactory(...).getTarget().invokeExact()``
 
 Using LambdaMetafactory.metafactory(), It is possible to inject a lamdba functional interface into a class at runtime that makes a delegated function invocation via invokeDynamic.
   
