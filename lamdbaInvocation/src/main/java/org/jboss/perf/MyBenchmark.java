@@ -52,28 +52,27 @@ public class MyBenchmark {
    }
 
    @Benchmark
-   public int testMH(BenchmarkState benchmarkState) throws Throwable {
-      benchmarkState.mh.invoke( 1000, benchmarkState.count  );
-      return benchmarkState.count;
+   public Object testMH(BenchmarkState benchmarkState) throws Throwable {
+      benchmarkState.count++;
+      return benchmarkState.mh.invoke( 1000, benchmarkState.count  ).toString();
    }
 
    @Benchmark
-   public int testReflection(BenchmarkState benchmarkState) throws Throwable {
-      benchmarkState.reflected.invoke( benchmarkState.simpleBean, 1000, benchmarkState.count );
-      return benchmarkState.count;
+   public Object testReflection(BenchmarkState benchmarkState) throws Throwable {
+      benchmarkState.count++;
+      return benchmarkState.reflected.invoke( benchmarkState.simpleBean, 1000, benchmarkState.count ) ;
    }
 
    @Benchmark
    public int testDirect(BenchmarkState benchmarkState) {
-      benchmarkState.count += benchmarkState.simpleBean.myMethod( 1000, benchmarkState.count );
-      benchmarkState.simpleBean.parse( new Object() );
-      return benchmarkState.count;
+      benchmarkState.count++;
+      return benchmarkState.simpleBean.myMethod( 1000, benchmarkState.count );
    }
 
    @Benchmark
    public int testLambda(BenchmarkState benchmarkState) {
-      benchmarkState.count += benchmarkState.lambda.applyAsInt( 1000, benchmarkState.count );
-      return benchmarkState.count;
+      benchmarkState.count++;
+      return benchmarkState.lambda.applyAsInt( 1000, benchmarkState.count );
    }
 
 }
