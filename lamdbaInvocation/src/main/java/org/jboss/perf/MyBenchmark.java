@@ -58,6 +58,12 @@ public class MyBenchmark {
    }
 
    @Benchmark
+   public Object testMHinvokeExact(BenchmarkState benchmarkState) throws Throwable {
+      benchmarkState.count++;
+      return benchmarkState.mh.invokeExact( 1000, benchmarkState.count  ).toString();
+   }
+
+   @Benchmark
    public Object testReflection(BenchmarkState benchmarkState) throws Throwable {
       benchmarkState.count++;
       return benchmarkState.reflected.invoke( benchmarkState.simpleBean, 1000, benchmarkState.count ) ;
