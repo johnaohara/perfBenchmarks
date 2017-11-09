@@ -61,7 +61,7 @@ MyBenchmark.testReflection:instructions:u              thrpt   10        147.204
 
 ````
 
-Reflection requires 4.56 times more cpu cycles per invocation compared to a direct method call, whereas an injected lambda require a 1.03 times more cpu cyles to invoke the reflected method.
+Reflection requires 4.56 times more cpu cycles per invocation compared to a direct method call, whereas an injected lambda require a 1.14 times more cpu cyles to invoke the reflected method.
 
 This increase in number of instructions and cpu cycles is reflected in the throughputs recorded by the benchmark
 
