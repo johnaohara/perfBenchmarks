@@ -38,4 +38,30 @@ public class SimpleBean {
       return a<b? a: b;
    }
 
+   public Object returnBean(){
+      return new ReturnBean();
+   } 
+
+
+   public class ReturnBean {
+      private String name = "RetBean";
+
+      public ReturnBean() {
+      }
+
+      public String getName() {
+         return name;
+      }
+
+      public void setName(String name) {
+         this.name = name;
+      }
+
+      @Override
+      public String toString() {
+         return "ReturnBean{" +
+             "name='" + name + '\'' +
+             '}';
+      }
+   }
 }
