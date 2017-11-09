@@ -20,13 +20,13 @@ public class MyBenchmark {
    @State(Scope.Thread)
    public static class BenchmarkState {
 
-
       public SimpleBean simpleBean;
 
       public int count = 0;
       public static final Method reflected;
-      public static final MethodHandles.Lookup lookup;
-      public static final MethodHandle mh;
+      public static final MethodHandles.Lookup methodHandlesLookup;
+      public static final MethodHandle staticMethodHandle;
+      public MethodHandle methodHandle;
       public static final IntBinaryOperator lambda;
 
       static {
@@ -34,14 +34,14 @@ public class MyBenchmark {
          Method initializeReflected = null;
          IntBinaryOperator reflectedLambda = null;
 
-         lookup = MethodHandles.lookup();
+         methodHandlesLookup = MethodHandles.lookup();
 
          try {
             initializeReflected = SimpleBean.class.getDeclaredMethod( "myMethod", int.class, int.class );
-            initializeMH = lookup.unreflect( initializeReflected );
+            initializeMH = methodHandlesLookup.unreflect( initializeReflected );
 
             CallSite site = LambdaMetafactory.metafactory(
-                lookup, "applyAsInt", MethodType.methodType( IntBinaryOperator.class ),
+                methodHandlesLookup, "applyAsInt", MethodType.methodType( IntBinaryOperator.class ),
                 initializeMH.type(), initializeMH, initializeMH.type() );
 
             MethodHandle factory = site.getTarget();
@@ -61,27 +61,40 @@ public class MyBenchmark {
 
          lambda = reflectedLambda;
          reflected = initializeReflected;
-         mh = initializeMH;
+         staticMethodHandle = initializeMH;
       }
 
       @Setup(Level.Trial)
       public void setup() throws Throwable {
 
          simpleBean = new SimpleBean();
+         methodHandle = methodHandlesLookup.unreflect( reflected );
 
       }
    }
 
    @Benchmark
-   public int testMH(BenchmarkState benchmarkState) throws Throwable {
+   public int testMethodHandle(BenchmarkState benchmarkState) throws Throwable {
       benchmarkState.count++;
-      return (int) benchmarkState.mh.invoke( 1000, benchmarkState.count  );
+      return (int) benchmarkState.methodHandle.invoke( 1000, benchmarkState.count  );
    }
 
    @Benchmark
-   public int testMHinvokeExact(BenchmarkState benchmarkState) throws Throwable {
+   public int testMethodHandleInvokeExact(BenchmarkState benchmarkState) throws Throwable {
       benchmarkState.count++;
-      return (int) benchmarkState.mh.invokeExact( 1000, benchmarkState.count  );
+      return (int) benchmarkState.methodHandle.invokeExact( 1000, benchmarkState.count  );
+   }
+
+   @Benchmark
+   public int testStaticMethodHandleInvoke(BenchmarkState benchmarkState) throws Throwable {
+      benchmarkState.count++;
+      return (int) benchmarkState.staticMethodHandle.invoke( 1000, benchmarkState.count  );
+   }
+
+   @Benchmark
+   public int testStaticMethodHandleInvokeExact(BenchmarkState benchmarkState) throws Throwable {
+      benchmarkState.count++;
+      return (int) benchmarkState.staticMethodHandle.invokeExact( 1000, benchmarkState.count  );
    }
 
    @Benchmark
