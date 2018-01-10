@@ -86,13 +86,13 @@ public class MyBenchmark {
    }
 
    @Benchmark
-   public int testStaticMethodHandleInvoke(BenchmarkState benchmarkState) throws Throwable {
+   public int testStaticFinalMethodHandleInvoke(BenchmarkState benchmarkState) throws Throwable {
       benchmarkState.count++;
       return (int) benchmarkState.staticMethodHandle.invoke( 1000, benchmarkState.count  );
    }
 
    @Benchmark
-   public int testStaticMethodHandleInvokeExact(BenchmarkState benchmarkState) throws Throwable {
+   public int testStaticFinalMethodHandleInvokeExact(BenchmarkState benchmarkState) throws Throwable {
       benchmarkState.count++;
       return (int) benchmarkState.staticMethodHandle.invokeExact( 1000, benchmarkState.count  );
    }
