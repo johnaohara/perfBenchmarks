@@ -1,5 +1,7 @@
 package org.jboss.perf;
 
+import org.jboss.perf.model.Company;
+import org.jboss.perf.model.Person;
 import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.Level;
 import org.openjdk.jmh.annotations.Scope;
@@ -13,6 +15,7 @@ import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodType;
 import java.lang.reflect.Method;
+import java.util.function.Function;
 import java.util.function.IntBinaryOperator;
 
 public class MyBenchmark {
@@ -28,6 +31,12 @@ public class MyBenchmark {
       public static final MethodHandle staticMethodHandle;
       public MethodHandle methodHandle;
       public static final IntBinaryOperator lambda;
+
+      public Function<Person, String> personGetter;
+      public Function<Company, String> companyLambda;
+
+      private Person person;
+      private Company company;
 
       static {
          MethodHandle initializeMH = null;
@@ -47,7 +56,6 @@ public class MyBenchmark {
             MethodHandle factory = site.getTarget();
 
             reflectedLambda = (IntBinaryOperator) factory.invokeExact();
-
 
          } catch (NoSuchMethodException e) {
             e.printStackTrace();
@@ -69,6 +77,12 @@ public class MyBenchmark {
 
          simpleBean = new SimpleBean();
          methodHandle = methodHandlesLookup.unreflect( reflected );
+
+         personGetter = buildGetterLambda( String.class, Person.class, "getName" );
+         companyLambda = buildGetterLambda( String.class, Company.class, "getName" );
+
+         person = new Person("bob");
+         company = new Company("Red Hat");
 
       }
    }
@@ -113,5 +127,34 @@ public class MyBenchmark {
    public int testLambda(BenchmarkState benchmarkState) {
       benchmarkState.count++;
       return benchmarkState.lambda.applyAsInt( 1000, benchmarkState.count );
+   }
+
+   @Benchmark
+   public String testPersonLambda(BenchmarkState benchmarkState) {
+      benchmarkState.count++;
+      benchmarkState.personGetter.apply( benchmarkState.person );
+      return benchmarkState.personGetter.apply( benchmarkState.person );
+   }
+
+   @Benchmark
+   public String testPolyMorphoicLambda(BenchmarkState benchmarkState) {
+      benchmarkState.count++;
+      benchmarkState.personGetter.apply( benchmarkState.person );
+      return benchmarkState.companyLambda.apply( benchmarkState.company );
+   }
+
+   static <T, R> Function<T, R> buildGetterLambda(Class<R> returnType, Class<T> objType, String gettername) throws Throwable{
+
+      final MethodHandles.Lookup lookup = MethodHandles.lookup();
+
+      final CallSite site = LambdaMetafactory.metafactory(lookup,
+          "apply",
+          MethodType.methodType(Function.class),
+          MethodType.methodType(Object.class, Object.class),
+          lookup.findVirtual(objType, gettername, MethodType.methodType(returnType)),
+          MethodType.methodType(returnType, objType));
+
+      return (Function) site.getTarget().invokeExact();
+
    }
 }
